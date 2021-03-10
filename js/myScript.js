@@ -51,58 +51,63 @@ const LeftElevatorObj = {
 
 //functions
 
-function inviteElevator(e, num) {
+function inviteElevator(e, floorNum) {
   e.target.style.backgroundColor = "red";
   //TODO: check whos closest elevator and add to its array
-  let [closestDOM, closestObj] = findClosest(num);
+
+  let [closestDOM, closestObj] = findClosest(floorNum);
+  //closestObj.array.push(num);
+  console.log(closestObj.array);
 
   //animation
-  myMove(e, num);
+  myMove(e, floorNum);
+
+  closestObj.array = closestObj.array.filter((num) => num != floorNum);
 }
 
-function findClosest(num) {
+function findClosest(floorNum) {
   //checking which elevator is closest
   if (
-    Math.abs(RightElevatorObj.floor - num) <
-    Math.abs(LeftElevatorObj.floor - num)
+    Math.abs(RightElevatorObj.floor - floorNum) <
+    Math.abs(LeftElevatorObj.floor - floorNum)
   ) {
-    RightElevatorObj.floor = num;
-    RightElevatorObj.array.push(num);
+    RightElevatorObj.floor = floorNum;
+    RightElevatorObj.array.push(floorNum);
     RightElevatorObj.isFree = false;
     return [right_Elevator, RightElevatorObj];
   } else if (
-    Math.abs(RightElevatorObj.floor - num) >
-    Math.abs(LeftElevatorObj.floor - num)
+    Math.abs(RightElevatorObj.floor - floorNum) >
+    Math.abs(LeftElevatorObj.floor - floorNum)
   ) {
-    LeftElevatorObj.floor = num;
-    LeftElevatorObj.array.push(num);
+    LeftElevatorObj.floor = floorNum;
+    LeftElevatorObj.array.push(floorNum);
     LeftElevatorObj.isFree = false;
     return [left_Elevator, LeftElevatorObj];
   } else {
     //default (if 2 elevators on the same distance call the right one)
-    RightElevatorObj.floor = num;
-    RightElevatorObj.array.push(num);
+    RightElevatorObj.floor = floorNum;
+    RightElevatorObj.array.push(floorNum);
     RightElevatorObj.isFree = false;
     return [right_Elevator, RightElevatorObj];
   }
 }
 
-function myMove(e, num) {
-  let [closestDOM, closestObj] = findClosest(num);
+function myMove(e, floorNum) {
+  let [closestDOM, closestObj] = findClosest(floorNum);
   let pos = closestDOM.style.bottom.split("px")[0];
   console.log("pos", pos);
   clearInterval(intervalId);
   intervalId = setInterval(frame, 5);
   function frame() {
-    if (pos == num * 200) {
+    if (pos == floorNum * 200) {
       e.target.style.backgroundColor = "green";
       clearInterval(intervalId);
     } else {
-      if (pos > num * 200) {
+      if (pos > floorNum * 200) {
         console.log("bigger");
         pos--;
         closestDOM.style.bottom = pos + "px";
-      } else if (pos < num * 200) {
+      } else if (pos < floorNum * 200) {
         console.log("smaller");
 
         pos++;
