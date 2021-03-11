@@ -1,5 +1,7 @@
-const FLOORS = 7;
-
+const FLOORS = 8;
+const NUM_OF_ELEVATORS = 2;
+const elevators = [];
+const elevatorsQueue = [];
 // DOM elements
 let buildingDOM = document.querySelector(".building");
 let floorDOM = document.querySelector(".floor");
@@ -7,115 +9,125 @@ let left_Elevator = document.querySelector(".elevator-left");
 let right_Elevator = document.querySelector(".elevator-right");
 
 let intervalId = null;
-//////////////////////////////
-let floor_0_btn = document.querySelector(".btn-0");
-floor_0_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 0);
-});
-let floor_1_btn = document.querySelector(".btn-1");
-floor_1_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 1);
-});
-let floor_2_btn = document.querySelector(".btn-2");
-floor_2_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 2);
-});
-let floor_3_btn = document.querySelector(".btn-3");
-floor_3_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 3);
-});
-let floor_4_btn = document.querySelector(".btn-4");
-floor_4_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 4);
-});
-let floor_5_btn = document.querySelector(".btn-5");
-floor_5_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 5);
-});
-let floor_6_btn = document.querySelector(".btn-6");
-floor_6_btn.addEventListener("click", (e) => {
-  inviteElevator(e, 6);
-});
-
-/////////////////////////////
-const RightElevatorObj = {
-  isFree: true,
-  floor: 0,
-  array: [],
-};
-const LeftElevatorObj = {
-  isFree: true,
-  floor: 0,
-  array: [],
-};
 
 //functions
 
 function inviteElevator(e, floorNum) {
   e.target.style.backgroundColor = "red";
-  //TODO: check whos closest elevator and add to its array
-
-  let [closestDOM, closestObj] = findClosest(floorNum);
-  //closestObj.array.push(num);
-  console.log(closestObj.array);
-
-  //animation
-  myMove(e, floorNum);
-
-  closestObj.array = closestObj.array.filter((num) => num != floorNum);
+  elevatorsQueue.push(floorNum);
 }
-
-function findClosest(floorNum) {
-  //checking which elevator is closest
-  if (
-    Math.abs(RightElevatorObj.floor - floorNum) <
-    Math.abs(LeftElevatorObj.floor - floorNum)
-  ) {
-    RightElevatorObj.floor = floorNum;
-    RightElevatorObj.array.push(floorNum);
-    RightElevatorObj.isFree = false;
-    return [right_Elevator, RightElevatorObj];
-  } else if (
-    Math.abs(RightElevatorObj.floor - floorNum) >
-    Math.abs(LeftElevatorObj.floor - floorNum)
-  ) {
-    LeftElevatorObj.floor = floorNum;
-    LeftElevatorObj.array.push(floorNum);
-    LeftElevatorObj.isFree = false;
-    return [left_Elevator, LeftElevatorObj];
-  } else {
-    //default (if 2 elevators on the same distance call the right one)
-    RightElevatorObj.floor = floorNum;
-    RightElevatorObj.array.push(floorNum);
-    RightElevatorObj.isFree = false;
-    return [right_Elevator, RightElevatorObj];
+function findElevator(floorNum) {
+  let min = FLOORS + 1;
+  let elevator_floor = -1;
+  for (let i = 0; i < elevators.length; i++) {
+    const absoluteDistance = Math.abs(elevators[i].floor - floorNum);
+    if (absoluteDistance < min && elevators[i].isFree === true) {
+      min = absoluteDistance;
+      elevator_floor = i;
+    }
+  }
+  if (elevator_floor > -1) {
+    myMove(
+      document.querySelector(`.btn-${floorNum}`),
+      floorNum,
+      elevators[elevator_floor]
+    );
+    elevator_floor = -1;
+    elevatorsQueue.shift();
   }
 }
 
-function myMove(e, floorNum) {
-  let [closestDOM, closestObj] = findClosest(floorNum);
-  let pos = closestDOM.style.bottom.split("px")[0];
-  console.log("pos", pos);
-  clearInterval(intervalId);
-  intervalId = setInterval(frame, 5);
+function myMove(e, floorNum, elevatorObj) {
+  elevatorObj.isFree = false;
+
+  let pos = elevatorObj.DOM.style.bottom.split("px")[0];
+  //closestObj.queue.push(floorNum);
+
+  elevatorObj.intervalId = setInterval(frame.bind(this), 5);
+
+  //check if queue is not empty
   function frame() {
     if (pos == floorNum * 200) {
-      e.target.style.backgroundColor = "green";
-      clearInterval(intervalId);
+      e.style.backgroundColor = "green";
+      console.log(e.parentElement.parentElement);
+      clearInterval(elevatorObj.intervalId);
+      setTimeout(() => {
+        elevatorObj.isFree = true;
+      }, 2000);
     } else {
       if (pos > floorNum * 200) {
         console.log("bigger");
         pos--;
-        closestDOM.style.bottom = pos + "px";
+        elevatorObj.DOM.style.bottom = pos + "px";
       } else if (pos < floorNum * 200) {
         console.log("smaller");
-
         pos++;
-        closestDOM.style.bottom = pos + "px";
-      } else {
-        console.log("wtf");
-        pos = closest.style.bottom;
+        elevatorObj.DOM.style.bottom = pos + "px";
       }
     }
   }
 }
+
+const initBuilding = () => {
+  // buildingDOM.style.height = FLOORS * 200 + "px";
+  console.log(buildingDOM.style.height);
+  for (let i = FLOORS; i >= 0; i--) {
+    const floor = document.createElement("div");
+    floor.classList.add(`floor`);
+    floor.classList.add(`floor-${i}`);
+    const txt_btn_container = document.createElement("div");
+    txt_btn_container.classList.add("btn-text-container");
+    const btn = document.createElement("button");
+    btn.innerText = "Press to call elevator";
+    btn.classList.add(`btn`);
+    btn.classList.add(`btn-${i}`);
+    btn.addEventListener("click", (e) => {
+      inviteElevator(e, i);
+    });
+    const floorNum = document.createElement("span");
+    floorNum.classList.add("floor-number");
+    floorNum.innerText = i;
+
+    //assigning elemnts to DOM
+    txt_btn_container.appendChild(btn);
+    txt_btn_container.appendChild(floorNum);
+    floor.appendChild(txt_btn_container);
+    buildingDOM.appendChild(floor);
+
+    if (i == 0) {
+      let elevator_container = document.createElement("div");
+      elevator_container.classList.add("elevator_container");
+      let elevator_left = 0;
+      for (let j = 0; j < NUM_OF_ELEVATORS; j++) {
+        const elevator = document.createElement("div");
+        elevator.classList.add("elevator");
+        // elevator.classList.add(`elevator-${j}`);
+        elevator.innerText = `elevator number ${j + 1}`;
+        elevator.style.left = elevator_left + "px";
+        elevator_left += 200;
+        elevator_container.appendChild(elevator);
+
+        elevators.push({
+          isFree: true,
+          floor: 0,
+          elevatorNumber: j,
+          DOM: elevator,
+        });
+      }
+      floor.appendChild(elevator_container);
+    }
+  }
+  initEventLoop();
+};
+
+const initEventLoop = () => {
+  setInterval(() => {
+    if (elevatorsQueue.length != 0) {
+      findElevator(elevatorsQueue[0]);
+    }
+  }, 500);
+};
+
+initBuilding();
+
+//change color of elevator
