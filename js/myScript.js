@@ -1,12 +1,9 @@
-const FLOORS = 8;
-const NUM_OF_ELEVATORS = 2;
+const FLOORS = 10;
+const NUM_OF_ELEVATORS = 5;
 const elevators = [];
 const elevatorsQueue = [];
 // DOM elements
 let buildingDOM = document.querySelector(".building");
-let floorDOM = document.querySelector(".floor");
-let left_Elevator = document.querySelector(".elevator-left");
-let right_Elevator = document.querySelector(".elevator-right");
 
 let intervalId = null;
 
@@ -18,38 +15,34 @@ function inviteElevator(e, floorNum) {
 }
 function findElevator(floorNum) {
   let min = FLOORS + 1;
-  let elevator_floor = -1;
+  let elevatorIndex = -1;
   for (let i = 0; i < elevators.length; i++) {
     const absoluteDistance = Math.abs(elevators[i].floor - floorNum);
     if (absoluteDistance < min && elevators[i].isFree === true) {
       min = absoluteDistance;
-      elevator_floor = i;
+      elevatorIndex = i;
     }
   }
-  if (elevator_floor > -1) {
-    myMove(
+  console.log(elevatorIndex);
+  if (elevatorIndex > -1) {
+    moveElevtor(
       document.querySelector(`.btn-${floorNum}`),
       floorNum,
-      elevators[elevator_floor]
+      elevators[elevatorIndex]
     );
-    elevator_floor = -1;
+    // elevator_floor = -1;
     elevatorsQueue.shift();
   }
 }
 
-function myMove(e, floorNum, elevatorObj) {
+function moveElevtor(e, floorNum, elevatorObj) {
   elevatorObj.isFree = false;
-
+  elevatorObj.floor = floorNum;
   let pos = elevatorObj.DOM.style.bottom.split("px")[0];
-  //closestObj.queue.push(floorNum);
-
   elevatorObj.intervalId = setInterval(frame.bind(this), 5);
-
-  //check if queue is not empty
   function frame() {
     if (pos == floorNum * 200) {
       e.style.backgroundColor = "green";
-      console.log(e.parentElement.parentElement);
       clearInterval(elevatorObj.intervalId);
       setTimeout(() => {
         elevatorObj.isFree = true;
@@ -69,8 +62,6 @@ function myMove(e, floorNum, elevatorObj) {
 }
 
 const initBuilding = () => {
-  // buildingDOM.style.height = FLOORS * 200 + "px";
-  console.log(buildingDOM.style.height);
   for (let i = FLOORS; i >= 0; i--) {
     const floor = document.createElement("div");
     floor.classList.add(`floor`);
@@ -101,7 +92,6 @@ const initBuilding = () => {
       for (let j = 0; j < NUM_OF_ELEVATORS; j++) {
         const elevator = document.createElement("div");
         elevator.classList.add("elevator");
-        // elevator.classList.add(`elevator-${j}`);
         elevator.innerText = `elevator number ${j + 1}`;
         elevator.style.left = elevator_left + "px";
         elevator_left += 200;
