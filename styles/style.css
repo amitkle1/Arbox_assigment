@@ -7,8 +7,8 @@
 .building {
   display: flex;
   position: relative;
-  background-color: bisque;
-  width: 90%;
+  background-color: darkgrey;
+  width: 85%;
   margin: 0 auto;
   flex-direction: column;
 }
@@ -19,7 +19,7 @@
   background-color: #000;
   color: #fff;
   margin: 0 auto;
-  width: 90%;
+  width: 85%;
   height: 200px;
   border: 1px solid black;
   padding: 0px;
@@ -31,10 +31,14 @@
   height: 200px;
   border: 1px solid black;
 }
-
+.elevator_container {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0;
+  width: 100%;
+}
 .elevator {
-  background-image: url("../assets/elevator.jpg");
-  background-size: 100%;
   position: absolute;
   color: #fff;
   text-align: center;
@@ -48,12 +52,13 @@
   bottom: 0px;
 }
 
-.elevator_container {
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  bottom: 0;
-  width: 100%;
+.elevator-open {
+  background-image: url("../assets/elevator_opened.jpg");
+  background-size: 100%;
+}
+.elevator-closed {
+  background-image: url("../assets/elevator_closed.jpg");
+  background-size: 100%;
 }
 
 .btn-text-container {
@@ -67,6 +72,7 @@
   color: white;
   background-color: green;
   font-size: 1.5rem;
+  border: 1px solid #000;
 }
 .floor-number {
   color: #fff;
@@ -74,6 +80,7 @@
   width: 100px;
   font-size: 5rem;
   text-align: center;
+  border: 1px solid #000;
 }
 .waiting-time {
   color: #fff;
@@ -81,4 +88,5 @@
   width: 100px;
   font-size: 2rem;
   text-align: center;
+  border: 1px solid #fff;
 }

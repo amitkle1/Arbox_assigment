@@ -14,10 +14,9 @@ let intervalId = null;
 
 //adding floors and buttons as elements to htmlDOM
 const initBuilding = () => {
-  for (let i = FLOORS; i >= 0; i--) {
+  for (let i = FLOORS - 1; i >= 0; i--) {
     const floor = document.createElement("div");
     floor.classList.add(`floor`);
-    floor.classList.add(`floor-${i}`);
     const floorNum_btn_container = document.createElement("div");
     floorNum_btn_container.classList.add("btn-text-container");
     const btn = document.createElement("button");
@@ -44,11 +43,11 @@ const initBuilding = () => {
     if (i == 0) {
       let elevator_container = document.createElement("div");
       elevator_container.classList.add("elevator_container");
-      let elevator_left = 0;
+      let elevator_left = 200;
       for (let j = 0; j < NUM_OF_ELEVATORS; j++) {
         const elevator = document.createElement("div");
         elevator.classList.add("elevator");
-        //   elevator.innerText = `elevator number ${j + 1}`;
+        elevator.classList.add("elevator-closed");
         elevator.style.left = elevator_left + "px";
         elevator_left += 200;
         elevator_container.appendChild(elevator);
@@ -58,6 +57,7 @@ const initBuilding = () => {
           floor: 0,
           elevatorNumber: j,
           DOM: elevator,
+          intervalId: null,
         });
       }
       floor.appendChild(elevator_container);
@@ -108,24 +108,29 @@ function moveElevtor(e, floorNum, elevatorObj) {
   elevatorObj.isFree = false;
   elevatorObj.floor = floorNum;
   let pos = elevatorObj.DOM.style.bottom.split("px")[0];
-  elevatorObj.intervalId = setInterval(changeFloor, 5);
+  elevatorObj.intervalId = setInterval(changeFloor, 15);
   let timeElement = document.querySelector(`.waiting-time-${floorNum}`);
   function changeFloor() {
     if (pos == floorNum * 200) {
       e.style.backgroundColor = "green";
       sound.play();
       timeElement.innerText = "";
+      elevatorObj.DOM.classList.remove("elevator-closed");
+      elevatorObj.DOM.classList.add("elevator-open");
+
       clearInterval(elevatorObj.intervalId);
       setTimeout(() => {
         elevatorObj.isFree = true;
+        elevatorObj.DOM.classList.remove("elevator-open");
+        elevatorObj.DOM.classList.add("elevator-closed");
       }, 2000);
     } else {
       if (pos > floorNum * 200) {
-        timeElement.innerText = Math.trunc((pos - floorNum * 200 - 1) / 60);
+        timeElement.innerText = Math.trunc((pos - floorNum * 200 - 1) / 60) + 1;
         pos--;
         elevatorObj.DOM.style.bottom = pos + "px";
       } else if (pos < floorNum * 200) {
-        timeElement.innerText = Math.trunc((floorNum * 200 - pos - 1) / 60);
+        timeElement.innerText = Math.trunc((floorNum * 200 - pos - 1) / 60) + 1;
         pos++;
         elevatorObj.DOM.style.bottom = pos + "px";
       }
