@@ -2,9 +2,8 @@ const FLOORS = 7;
 const NUM_OF_ELEVATORS = 2;
 const elevators = [];
 const elevatorsQueue = [];
-let buildingDOM = document.getElementById("building");
-const sound = new Audio();
-sound.src = "../sounds/dingdong.mp3";
+const buildingDOM = document.getElementById("building");
+const sound = document.getElementById("dingdong");
 
 // init of buildin: adding floors and buttons as elements to htmlDOM
 const initBuilding = () => {
