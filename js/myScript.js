@@ -2,17 +2,11 @@ const FLOORS = 7;
 const NUM_OF_ELEVATORS = 2;
 const elevators = [];
 const elevatorsQueue = [];
-// DOM elements
-let buildingDOM = document.querySelector(".building");
-
+let buildingDOM = document.getElementById("building");
 const sound = new Audio();
 sound.src = "../sounds/dingdong.mp3";
 
-let intervalId = null;
-
-//functions
-
-//adding floors and buttons as elements to htmlDOM
+// init of buildin: adding floors and buttons as elements to htmlDOM
 const initBuilding = () => {
   for (let i = FLOORS - 1; i >= 0; i--) {
     const floor = document.createElement("div");
@@ -20,6 +14,7 @@ const initBuilding = () => {
     const floorNum_btn_container = document.createElement("div");
     floorNum_btn_container.classList.add("btn-text-container");
     const btn = document.createElement("button");
+    btn.id = `btn-${i}`;
     btn.innerText = "Call elevator";
     btn.classList.add(`btn`);
     btn.classList.add(`btn-${i}`);
@@ -30,8 +25,8 @@ const initBuilding = () => {
     floorNum.classList.add("floor-number");
     floorNum.innerText = i;
     const waitingTime = document.createElement("div");
+    waitingTime.id = `waiting-time-${i}`;
     waitingTime.classList.add("waiting-time");
-    waitingTime.classList.add(`waiting-time-${i}`);
 
     //assigning elements to DOM
     floorNum_btn_container.appendChild(waitingTime);
@@ -77,6 +72,9 @@ const initEventLoop = () => {
 };
 
 function inviteElevator(e, floorNum) {
+  const button = document.getElementById(`btn-${floorNum}`);
+  button.disabled = true;
+  button.style.cursor = "default";
   e.target.style.backgroundColor = "red";
   elevatorsQueue.push(floorNum);
 }
@@ -94,7 +92,7 @@ function findElevator(floorNum) {
 
   if (elevatorIndex > -1) {
     moveElevtor(
-      document.querySelector(`.btn-${floorNum}`),
+      document.getElementById(`btn-${floorNum}`),
       floorNum,
       elevators[elevatorIndex]
     );
@@ -103,16 +101,18 @@ function findElevator(floorNum) {
   }
 }
 
-//moving the elevator to destionation floor
+//moving the elevator to destination floor
 function moveElevtor(e, floorNum, elevatorObj) {
   elevatorObj.isFree = false;
   elevatorObj.floor = floorNum;
   let pos = elevatorObj.DOM.style.bottom.split("px")[0];
   elevatorObj.intervalId = setInterval(changeFloor, 15);
-  let timeElement = document.querySelector(`.waiting-time-${floorNum}`);
+  let timeElement = document.getElementById(`waiting-time-${floorNum}`);
   function changeFloor() {
     if (pos == floorNum * 200) {
-      e.style.backgroundColor = "green";
+      e.disabled = false;
+      e.style.cursor = "pointer";
+      e.style.backgroundColor = "";
       sound.play();
       timeElement.innerText = "";
       elevatorObj.DOM.classList.remove("elevator-closed");
@@ -139,5 +139,3 @@ function moveElevtor(e, floorNum, elevatorObj) {
 }
 
 initBuilding();
-
-//change color of elevator
